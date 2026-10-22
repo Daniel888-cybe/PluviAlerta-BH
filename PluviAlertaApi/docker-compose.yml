@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?defina no .env}
+      MYSQL_USER: ${MYSQL_USER:?defina no .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?defina no .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina no .env}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: src/PluviAlerta.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__PluviAlerta: "Server=db;Port=3306;Database=${MYSQL_DATABASE};User=${MYSQL_USER};Password=${MYSQL_PASSWORD}"
+      Jwt__Chave: ${JWT_CHAVE:?defina no .env}
+      Admin__Usuario: ${ADMIN_USUARIO:?defina no .env}
+      Admin__Senha: ${ADMIN_SENHA:?defina no .env}
+      Telegram__BotToken: ${TELEGRAM_BOT_TOKEN:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>247019b3-505d-4b60-82d0-b0564876294b</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.21" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.21">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PluviAlerta.Domain\PluviAlerta.Domain.csproj" />
+    <ProjectReference Include="..\PluviAlerta.Infrastructure\PluviAlerta.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -5,11 +5,28 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Permitir que o React consulte a API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirFrontEnd", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+// Registrar o cliente HTTP usado pela Open-Meteo
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+// Ativar o CORS antes das rotas
+app.UseCors("PermitirFrontEnd");
+
 // IDs das nove regionais
+
 int[] ID = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
 // Nomes das regionais

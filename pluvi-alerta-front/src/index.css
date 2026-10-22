@@ -1,0 +1,738 @@
+
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* ---------- 1. Tokens ---------- */
+:root {
+  /* Base */
+  --bg: #f1f5fb;
+  --surface: #ffffff;
+  --border: #e2e8f4;
+  --text: #012150;
+  --navy: #012150;
+  --text-soft: #5b6b88;
+  --text-faint: #8a97b0;
+
+  /* Marca / azul */
+  --blue-600: #066dcc;
+  --blue-700: #0a4fa0;
+  --blue-50: #eef6ff;
+  --blue-200: #b9dbf7;
+  --sky-400: #43aff0;
+
+  /* Chuva / ciano */
+  --teal-600: #0891b2;
+  --teal-700: #0e7490;
+  --teal-50: #e8fbfd;
+  --teal-200: #a5ecf3;
+
+  /* Verde / normal */
+  --green-600: #059669;
+  --green-700: #047857;
+  --green-50: #ecfdf5;
+  --green-200: #a7f3d0;
+
+  /* Atenção / laranja */
+  --orange-500: #ff560b;
+  --orange-700: #c93c00;
+  --orange-50: #fff3ec;
+  --orange-200: #ffcfb5;
+
+  /* Alarme / vermelho */
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --red-50: #fef2f2;
+  --red-200: #fecaca;
+
+  /* Forma */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 1px 2px rgba(15, 27, 51, 0.04), 0 8px 24px -12px rgba(6, 109, 204, 0.18);
+  --shadow-pop: 0 12px 32px -12px rgba(6, 109, 204, 0.35);
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- 2. Reset leve ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background:
+    radial-gradient(900px 400px at 85% -10%, rgba(6, 109, 204, 0.08), transparent 60%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue-200);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---------- 3. Layout ---------- */
+.container {
+  width: min(1120px, 100% - 40px);
+  margin-inline: auto;
+}
+
+.main {
+  padding-block: 28px 56px;
+  display: grid;
+  gap: 24px;
+}
+
+/* ---------- 4. Cabeçalho ---------- */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand__logo {
+  height: 52px;
+  width: auto;
+  display: block;
+}
+
+.brand__name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--navy);
+}
+
+.brand__name span {
+  color: var(--blue-600);
+}
+
+.brand__tagline {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+/* ---------- 5. Chips e status ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  white-space: nowrap;
+}
+
+.chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chip--live::before {
+  animation: pulse 2s ease-out infinite;
+}
+
+.chip--blue {
+  color: var(--blue-700);
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+}
+
+.chip--blue::before {
+  display: none;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
+  100% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+}
+
+/* ---------- 5b. Faixa do slogan ---------- */
+.tagline-bar {
+  background: linear-gradient(100deg, var(--navy), #04388a 60%, var(--blue-600));
+  color: #fff;
+}
+
+.tagline-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding-block: 10px;
+  font-size: 0.85rem;
+}
+
+.tagline-bar__slogan {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.tagline-bar__city {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--blue-200);
+  font-weight: 500;
+}
+
+.tagline-bar__city::before {
+  content: "";
+  width: 28px;
+  height: 2px;
+  background: var(--sky-400);
+}
+
+/* ---------- 6. Título da página ---------- */
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.hero__kicker {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--blue-600);
+  margin-bottom: 4px;
+}
+
+.hero__title {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.hero__subtitle {
+  margin-top: 6px;
+  color: var(--text-soft);
+}
+
+.hero__actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- 7. Botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn--primary {
+  background: var(--blue-600);
+  box-shadow: 0 6px 16px -6px rgba(6, 109, 204, 0.6);
+}
+
+.btn--primary:hover {
+  background: var(--blue-700);
+}
+
+.btn--success {
+  background: var(--green-600);
+  box-shadow: 0 6px 16px -6px rgba(5, 150, 105, 0.6);
+}
+
+.btn--success:hover {
+  background: var(--green-700);
+}
+
+/* ---------- 8. Cartões base ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 22px;
+}
+
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.card__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+/* ---------- 9. Cartões de métricas (estilo do painel) ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat {
+  --tone: var(--blue-600);
+  --tone-dark: var(--blue-700);
+  --tone-soft: var(--blue-50);
+  --tone-line: var(--blue-200);
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--tone-line);
+  background: linear-gradient(135deg, var(--tone-soft), #fff 130%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.stat__label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--tone);
+}
+
+.stat__value {
+  margin-top: 4px;
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--tone-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__unit {
+  margin-left: 3px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tone);
+}
+
+.stat__hint {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+.stat__icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--tone);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.stat__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Variações de cor */
+.stat--blue   { --tone: var(--blue-600);  --tone-dark: var(--blue-700);  --tone-soft: var(--blue-50);  --tone-line: var(--blue-200); }
+.stat--teal   { --tone: var(--teal-600);  --tone-dark: var(--teal-700);  --tone-soft: var(--teal-50);  --tone-line: var(--teal-200); }
+.stat--green  { --tone: var(--green-600); --tone-dark: var(--green-700); --tone-soft: var(--green-50); --tone-line: var(--green-200); }
+.stat--orange { --tone: var(--orange-700); --tone-dark: var(--orange-700); --tone-soft: var(--orange-50); --tone-line: var(--orange-200); }
+.stat--red    { --tone: var(--red-600);   --tone-dark: var(--red-700);   --tone-soft: var(--red-50);   --tone-line: var(--red-200); }
+
+/* Estado "sem dados" (--) */
+.stat__value.is-empty {
+  color: var(--text-faint);
+}
+
+/* ---------- 10. Seção de regionais ---------- */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-head__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-head__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.regions {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.region {
+  --tone: var(--green-600);
+  --tone-soft: var(--green-50);
+  --tone-line: var(--green-200);
+  --level: 20%;
+
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.region::before {
+  /* faixa colorida lateral = nível de alerta */
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--tone);
+}
+
+.region:hover {
+  transform: translateY(-2px);
+  border-color: var(--tone-line);
+}
+
+.region__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.region__name {
+  font-weight: 700;
+}
+
+.region__rain {
+  margin-top: 12px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.region__rain small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.region__meta {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+/* Barra de nível — lembra a área do gráfico */
+.meter {
+  margin-top: 14px;
+  height: 8px;
+  border-radius: 999px;
+  background: #eaf0fa;
+  overflow: hidden;
+}
+
+.meter__fill {
+  display: block;
+  height: 100%;
+  width: var(--level);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--tone), color-mix(in srgb, var(--tone) 60%, #fff));
+  transition: width 0.6s ease;
+}
+
+.region--normal { --tone: var(--green-600);  --tone-soft: var(--green-50);  --tone-line: var(--green-200); }
+.region--watch  { --tone: var(--blue-600);   --tone-soft: var(--blue-50);   --tone-line: var(--blue-200); }
+.region--alert  { --tone: var(--orange-500); --tone-soft: var(--orange-50); --tone-line: var(--orange-200); }
+.region--alarm  { --tone: var(--red-600);    --tone-soft: var(--red-50);    --tone-line: var(--red-200); }
+
+/* Selo de status dentro do cartão */
+.badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--tone);
+  background: var(--tone-soft);
+  border: 1px solid var(--tone-line);
+}
+
+.region--alert .badge { color: var(--orange-700); }
+
+/* ---------- 11. Mensagens (erro, vazio, sucesso) ---------- */
+.notice {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  border: 1px solid var(--red-200);
+  background: var(--red-50);
+  color: var(--red-700);
+}
+
+.notice::before {
+  content: "!";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--red-600);
+}
+
+.notice--info {
+  color: var(--blue-700);
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+}
+
+.notice--info::before {
+  content: "i";
+  background: var(--blue-600);
+}
+
+.notice__action {
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Skeleton de carregamento */
+.skeleton {
+  border-radius: var(--radius-md);
+  min-height: 130px;
+  background: linear-gradient(90deg, #eaf0fa 25%, #f6f9fe 50%, #eaf0fa 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
+/* ---------- 12. Central de alertas ---------- */
+.alerts__list {
+  display: grid;
+  gap: 12px;
+}
+
+.alert-item {
+  --tone: var(--orange-500);
+  --tone-soft: var(--orange-50);
+  --tone-line: var(--orange-200);
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--tone-soft);
+  border: 1px solid var(--tone-line);
+}
+
+.alert-item--alarm {
+  --tone: var(--red-600);
+  --tone-soft: var(--red-50);
+  --tone-line: var(--red-200);
+}
+
+.alert-item__icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--tone);
+}
+
+.alert-item__title {
+  font-weight: 700;
+}
+
+.alert-item__text {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.alert-item__time {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* Versão "vazio": quando ainda não há integração */
+.alerts--empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alerts--empty .alert-item__icon {
+  background: var(--orange-50);
+  color: var(--orange-700);
+  border: 1px solid var(--orange-200);
+}
+
+/* ---------- 13. Rodapé ---------- */
+.footer {
+  border-top: 1px solid var(--border);
+  padding-block: 28px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.footer__logo {
+  height: 44px;
+  width: auto;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+/* ---------- 14. Responsivo ---------- */
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: min(1120px, 100% - 28px);
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .header__inner {
+    flex-wrap: wrap;
+  }
+
+  .hero__actions {
+    width: 100%;
+  }
+
+  .hero__actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .alert-item {
+    flex-wrap: wrap;
+  }
+
+  .alert-item__time {
+    margin-left: 52px;
+  }
+}
+
+/* ---------- 15. Acessibilidade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

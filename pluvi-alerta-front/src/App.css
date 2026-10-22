@@ -1,0 +1,564 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* ---------- Tokens ---------- */
+:root {
+  --bg: #f1f5fb;
+  --surface: #ffffff;
+  --border: #e2e8f4;
+  --navy: #012150;
+  --text: #012150;
+  --text-soft: #5b6b88;
+  --text-faint: #8a97b0;
+
+  --blue: #066dcc;
+  --blue-dark: #0a4fa0;
+  --blue-soft: #eef6ff;
+  --blue-line: #b9dbf7;
+  --sky: #43aff0;
+
+  --teal: #0891b2;
+  --teal-dark: #0e7490;
+  --teal-soft: #e8fbfd;
+  --teal-line: #a5ecf3;
+
+  --orange: #ff560b;
+  --orange-dark: #c93c00;
+  --orange-soft: #fff3ec;
+  --orange-line: #ffcfb5;
+
+  --red: #dc2626;
+  --red-dark: #b91c1c;
+  --red-soft: #fef2f2;
+  --red-line: #fecaca;
+
+  --green: #059669;
+  --green-dark: #047857;
+  --green-soft: #ecfdf5;
+  --green-line: #a7f3d0;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow: 0 1px 2px rgba(1, 33, 80, 0.04), 0 8px 24px -12px rgba(6, 109, 204, 0.2);
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  display: block; /* neutraliza o flex/center padrão do Vite */
+  min-width: 320px;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background:
+    radial-gradient(900px 400px at 85% -10%, rgba(6, 109, 204, 0.09), transparent 60%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue-line);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---------- Layout geral ---------- */
+.dashboard {
+  width: min(1120px, 100% - 40px);
+  margin-inline: auto;
+  padding-bottom: 24px;
+  display: grid;
+  gap: 24px;
+}
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.marca-logo {
+  height: 54px;
+  width: auto;
+  display: block;
+}
+
+.marca h1 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--navy);
+}
+
+.marca h1 .destaque,
+.marca h1 span {
+  color: var(--blue);
+}
+
+.marca p {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+}
+
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulso 2s ease-out infinite;
+}
+
+@keyframes pulso {
+  0%   { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
+  100% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+}
+
+/* ---------- Faixa do slogan ---------- */
+.faixa-slogan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: #fff;
+  background: linear-gradient(100deg, var(--navy), #04388a 60%, var(--blue));
+}
+
+.faixa-slogan strong {
+  font-weight: 600;
+}
+
+.faixa-slogan span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--blue-line);
+}
+
+.faixa-slogan span::before {
+  content: "";
+  width: 28px;
+  height: 2px;
+  background: var(--sky);
+}
+
+/* ---------- Boas-vindas ---------- */
+.boas-vindas .sobretitulo {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--blue);
+  text-transform: none; /* mantém o texto como está no JSX; troque para uppercase se preferir */
+  letter-spacing: 0;
+}
+
+.boas-vindas h2 {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.boas-vindas p:last-child {
+  margin-top: 6px;
+  color: var(--text-soft);
+}
+
+/* ---------- Cartão base ---------- */
+.cartao {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Indicadores (estilo do painel de referência) ---------- */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.indicador {
+  --tom: var(--blue);
+  --tom-escuro: var(--blue-dark);
+  --tom-suave: var(--blue-soft);
+  --tom-linha: var(--blue-line);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--tom-linha);
+  background: linear-gradient(135deg, var(--tom-suave), #fff 130%);
+  transition: transform 0.2s ease;
+}
+
+.indicador:hover {
+  transform: translateY(-2px);
+}
+
+.indicador > span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--tom);
+}
+
+.indicador > strong {
+  margin-top: 2px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--tom-escuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.indicador > strong small {
+  margin-left: 2px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tom);
+}
+
+.indicador > small {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+/* Cores por posição: azul, ciano (chuva), laranja (alertas) */
+.indicador:nth-child(2) {
+  --tom: var(--teal);
+  --tom-escuro: var(--teal-dark);
+  --tom-suave: var(--teal-soft);
+  --tom-linha: var(--teal-line);
+}
+
+.indicador:nth-child(3) {
+  --tom: var(--orange-dark);
+  --tom-escuro: var(--orange-dark);
+  --tom-suave: var(--orange-soft);
+  --tom-linha: var(--orange-line);
+}
+
+/* ---------- Regionais ---------- */
+.titulo-secao {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titulo-secao h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.titulo-secao p {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.contador {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--blue-dark);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-line);
+}
+
+.secao-regionais > p:not(.mensagem-erro) {
+  margin-top: 16px;
+  color: var(--text-soft);
+}
+
+.grade-regionais {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.regional {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 18px 18px 16px 22px;
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.regional::before {
+  /* faixa lateral: cinza enquanto não há classificação de risco */
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--border);
+}
+
+.regional:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue-line);
+}
+
+.icone-regional {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  font-size: 1.15rem;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-line);
+}
+
+.regional h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.regional p {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.risco {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  background: #f3f6fb;
+  border: 1px solid var(--border);
+}
+
+/* Quando a API passar a devolver o risco, use estas classes no <article> */
+.regional.risco-normal::before   { background: var(--green); }
+.regional.risco-atencao::before  { background: var(--blue); }
+.regional.risco-alerta::before   { background: var(--orange); }
+.regional.risco-alarme::before   { background: var(--red); }
+
+.regional.risco-normal .risco  { color: var(--green-dark);  background: var(--green-soft);  border-color: var(--green-line); }
+.regional.risco-atencao .risco { color: var(--blue-dark);   background: var(--blue-soft);   border-color: var(--blue-line); }
+.regional.risco-alerta .risco  { color: var(--orange-dark); background: var(--orange-soft); border-color: var(--orange-line); }
+.regional.risco-alarme .risco  { color: var(--red-dark);    background: var(--red-soft);    border-color: var(--red-line); }
+
+/* ---------- Carregando / erro / vazio ---------- */
+.esqueleto {
+  min-height: 92px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, #eaf0fa 25%, #f6f9fe 50%, #eaf0fa 75%);
+  background-size: 200% 100%;
+  animation: brilho 1.4s linear infinite;
+}
+
+@keyframes brilho {
+  to { background-position: -200% 0; }
+}
+
+.mensagem-erro {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: var(--red-dark);
+  background: var(--red-soft);
+  border: 1px solid var(--red-line);
+}
+
+.mensagem-erro::before {
+  content: "!";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--red);
+}
+
+.mensagem-erro button {
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: inherit;
+  background: transparent;
+}
+
+.mensagem-erro button:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.vazio {
+  margin-top: 16px;
+  padding: 20px;
+  text-align: center;
+  color: var(--text-soft);
+  border: 1px dashed var(--blue-line);
+  border-radius: var(--radius-md);
+  background: var(--blue-soft);
+}
+
+/* ---------- Central de alertas ---------- */
+.area-alertas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.icone-alerta {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--orange-dark);
+  background: var(--orange-soft);
+  border: 1px solid var(--orange-line);
+}
+
+.area-alertas h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.area-alertas p {
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+/* ---------- Rodapé ---------- */
+footer {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.rodape-logo {
+  display: block;
+  height: 44px;
+  width: auto;
+  margin: 0 auto 8px;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .indicadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    width: min(1120px, 100% - 28px);
+  }
+
+  .cabecalho {
+    flex-wrap: wrap;
+  }
+
+  .indicadores {
+    grid-template-columns: 1fr;
+  }
+
+  .area-alertas {
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Acessibilidade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

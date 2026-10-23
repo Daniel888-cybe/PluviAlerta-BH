@@ -1,0 +1,577 @@
+/* =====================================================================
+   Integração com a API: níveis de risco, mapa, painel do score, alertas.
+   Usa os mesmos tokens do App.css (design original do Daniel).
+   ===================================================================== */
+
+:root {
+  --yellow: #d4a20a;
+  --yellow-dark: #8a6a00;
+  --yellow-soft: #fffbea;
+  --yellow-line: #fde68a;
+}
+
+/* Cada nível define as 4 cores que os componentes usam */
+.risco-verde    { --nivel: var(--green);  --nivel-escuro: var(--green-dark);  --nivel-suave: var(--green-soft);  --nivel-linha: var(--green-line); }
+.risco-amarelo  { --nivel: var(--yellow); --nivel-escuro: var(--yellow-dark); --nivel-suave: var(--yellow-soft); --nivel-linha: var(--yellow-line); }
+.risco-laranja  { --nivel: var(--orange); --nivel-escuro: var(--orange-dark); --nivel-suave: var(--orange-soft); --nivel-linha: var(--orange-line); }
+.risco-vermelho { --nivel: var(--red);    --nivel-escuro: var(--red-dark);    --nivel-suave: var(--red-soft);    --nivel-linha: var(--red-line); }
+
+/* ---------- Cabeçalho: status sem conexão ---------- */
+.status.status-off {
+  color: var(--red-dark);
+  background: var(--red-soft);
+  border-color: var(--red-line);
+}
+
+.status.status-off::before {
+  background: var(--red);
+  animation: none;
+}
+
+/* ---------- Aviso de simulação (honestidade na demo) ---------- */
+.aviso-simulacao {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  color: var(--orange-dark);
+  background: var(--orange-soft);
+  border: 1px dashed var(--orange);
+}
+
+/* ---------- Boas-vindas com botão do Telegram ---------- */
+.boas-vindas.com-acao {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.botao-telegram {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  color: #fff;
+  background: #229ed9; /* azul do Telegram */
+  box-shadow: 0 6px 16px -6px rgba(34, 158, 217, 0.7);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.botao-telegram:hover {
+  transform: translateY(-1px);
+  background: #1a8bc2;
+}
+
+.botao-telegram.secundario {
+  margin-left: auto;
+  color: #1a8bc2;
+  background: #eaf6fc;
+  border: 1px solid #b6e0f4;
+  box-shadow: none;
+}
+
+/* ---------- Mapa + painel ---------- */
+.secao-mapa {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.mapa-cartao {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mapa {
+  flex: 1; /* estica até a altura do painel ao lado */
+  min-height: 460px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  z-index: 0; /* o Leaflet usa z-index alto; mantém o mapa abaixo do resto da página */
+}
+
+/* ".leaflet-tooltip" junto: o CSS do Leaflet carrega depois e venceria só com ".mapa-rotulo" */
+.leaflet-tooltip.mapa-rotulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--navy);
+  font-family: var(--font);
+  line-height: 1.05;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+  pointer-events: none;
+}
+
+.leaflet-tooltip.mapa-rotulo::before {
+  display: none;
+}
+
+.mapa-rotulo strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.mapa-rotulo span {
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 2px 6px 4px;
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--text-soft);
+}
+
+.legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legenda li::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--nivel, var(--blue));
+}
+
+.legenda .legenda-relato::before {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--blue-line);
+}
+
+/* ---------- Painel "Por que esse score?" ---------- */
+.painel {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 4px solid var(--nivel, var(--border));
+}
+
+.painel.esqueleto {
+  min-height: 460px;
+}
+
+.painel-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.painel-kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.painel h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.painel-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.painel-score strong {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--nivel-escuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.painel .risco,
+.regional[class*="risco-"] .risco {
+  color: var(--nivel-escuro);
+  background: var(--nivel-suave);
+  border: 1px solid var(--nivel-linha);
+}
+
+.painel-desc {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+.selo-simulacao {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--orange-dark);
+  background: var(--orange-soft);
+  border: 1px dashed var(--orange);
+}
+
+.painel-subtitulo {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.fatores {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.fator-linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.fator-linha strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.fator-linha small {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.fator-barra {
+  margin-top: 4px;
+  height: 7px;
+  border-radius: 999px;
+  background: #eaf0fa;
+  overflow: hidden;
+}
+
+.fator-barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--sky));
+  transition: width 0.6s ease;
+}
+
+.fator-detalhe {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+}
+
+.grafico {
+  margin: 0;
+}
+
+.grafico svg {
+  display: block;
+  width: 100%;
+  height: 110px;
+  border-radius: var(--radius-sm);
+  background: #f7faff;
+  border: 1px solid var(--border);
+}
+
+.grafico figcaption {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+}
+
+.grafico-vazio {
+  padding: 14px;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text-soft);
+  border: 1px dashed var(--blue-line);
+  border-radius: var(--radius-sm);
+  background: var(--blue-soft);
+}
+
+/* ---------- Cartões das regionais (agora clicáveis e coloridos) ---------- */
+button.regional {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.regional[class*="risco-"]::before {
+  background: var(--nivel);
+}
+
+.regional[class*="risco-"] .icone-regional {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--nivel-escuro);
+  background: var(--nivel-suave);
+  border-color: var(--nivel-linha);
+  font-variant-numeric: tabular-nums;
+}
+
+.regional.selecionada {
+  border-color: var(--nivel);
+  box-shadow: 0 0 0 2px var(--nivel-linha), var(--shadow);
+}
+
+.medidor {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  height: 6px;
+  border-radius: 999px;
+  background: #eaf0fa;
+  overflow: hidden;
+}
+
+.medidor span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--nivel);
+  transition: width 0.6s ease;
+}
+
+/* ---------- Central de alertas com dados ---------- */
+.area-alertas {
+  flex-wrap: wrap;
+}
+
+.alertas-conteudo {
+  flex: 1;
+  min-width: 240px;
+}
+
+.lista-alertas {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.lista-alertas li {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--nivel-suave);
+  border-left: 4px solid var(--nivel);
+}
+
+.lista-alertas li strong {
+  color: var(--nivel-escuro);
+}
+
+.lista-alertas li span {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+/* ---------- Rodapé com aviso e créditos ---------- */
+footer p + p {
+  margin-top: 4px;
+}
+
+.rodape-aviso {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--navy);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-line);
+}
+
+footer a {
+  color: var(--blue);
+}
+
+/* ---------- Relatar um problema (formulário em cima do mapa) ---------- */
+.mapa-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px 0;
+}
+
+.mapa-barra strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mapa-barra span {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+.btn-relatar {
+  flex: none;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--blue);
+  box-shadow: 0 6px 16px -6px rgba(6, 109, 204, 0.6);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-relatar:hover {
+  transform: translateY(-1px);
+  background: var(--blue-dark);
+}
+
+.mapa.modo-relato {
+  cursor: crosshair;
+  outline: 3px dashed var(--sky);
+  outline-offset: -3px;
+}
+
+.mapa.modo-relato .leaflet-interactive {
+  cursor: crosshair;
+}
+
+.form-relato {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-line);
+}
+
+.form-relato-dica {
+  font-size: 0.88rem;
+}
+
+.form-relato-dica strong {
+  color: var(--blue);
+}
+
+.form-relato-tipos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tipo {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--blue-dark);
+  background: #fff;
+  border: 1px solid var(--blue-line);
+}
+
+.tipo.ativo {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.form-relato textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--blue-line);
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: #fff;
+  resize: vertical;
+}
+
+.form-relato-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-secundario,
+.btn-enviar {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.btn-secundario {
+  color: var(--text-soft);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.btn-enviar {
+  border: 0;
+  color: #fff;
+  background: var(--green);
+}
+
+.btn-enviar:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.form-relato-erro {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--red-dark);
+  background: var(--red-soft);
+  border: 1px solid var(--red-line);
+}
+
+.form-relato-nota {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+}
+
+.aviso-relato {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+}
+
+@media (max-width: 900px) {
+  .secao-mapa {
+    grid-template-columns: 1fr;
+  }
+
+  .mapa {
+    min-height: 380px;
+  }
+}

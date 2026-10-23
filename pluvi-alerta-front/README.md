@@ -28,7 +28,10 @@ VITE_API_URL=http://localhost:8080
 - **Relatar um problema:** botão "📍 Relatar um problema", um clique no mapa, a escolha do tipo e o envio. O score da regional é recalculado na hora.
 - **Cards das regionais**, ordenados pelo score.
 - **Central de alertas**, com as regionais em Laranja ou Vermelho, e o link para o bot **@PluviAlerta_bot** no Telegram.
-- **Área de demonstração** (`/#demo` ou o link no rodapé): login do admin, escolha da regional e **⛈️ Simular tempestade** ou **Encerrar simulações**, sem usar o Swagger.
+- **Área de demonstração** (`/#demo` ou o link no rodapé): login do admin, escolha da regional e **⛈️ Simular tempestade**, **Encerrar simulações** ou **🧹 Apagar relatos**, sem usar o Swagger.
+- **QR code do bot** na central de alertas. A imagem foi gerada uma vez, com `npx qrcode`, e não usa biblioteca no site.
+
+O roteiro da apresentação está em [`../docs/ROTEIRO-DEMO.md`](../docs/ROTEIRO-DEMO.md).
 - **Aviso de modo simulação** quando a demo injeta uma tempestade fictícia.
 - **Atualização automática** a cada 1 minuto.
 

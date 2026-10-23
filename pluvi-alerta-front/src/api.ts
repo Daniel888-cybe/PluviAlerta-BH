@@ -136,4 +136,15 @@ export const simularTempestade = (token: string, p: ParametrosSimulacao) =>
 export const encerrarSimulacoes = (token: string) =>
   chamarAdmin(token, 'DELETE') as Promise<{ scoresSimuladosApagados: number }>
 
+// Apaga todos os relatos (para apresentar com o mapa limpo depois dos ensaios).
+export async function apagarRelatos(token: string): Promise<{ relatosApagados: number }> {
+  const resposta = await fetch('/api/relatos', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (resposta.status === 401) throw new SessaoExpirada('A sessão expirou. Entre de novo.')
+  if (!resposta.ok) throw new Error(`A API respondeu ${resposta.status}.`)
+  return resposta.json() as Promise<{ relatosApagados: number }>
+}
+
 export const LINK_TELEGRAM = 'https://t.me/PluviAlerta_bot'

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  apagarRelatos,
   encerrarSimulacoes,
   entrarComoAdmin,
   SessaoExpirada,
@@ -105,6 +106,14 @@ export function PainelDemo({ regioes, aoMudar, aoFechar }: Props) {
       aoMudar()
     })
 
+  const limparRelatos = () =>
+    executar(async () => {
+      if (!token || !window.confirm('Apagar TODOS os relatos do mapa?')) return
+      const r = await apagarRelatos(token)
+      setMensagem({ tipo: 'ok', texto: `${r.relatosApagados} relato(s) apagado(s). O mapa está limpo.` })
+      aoMudar()
+    })
+
   return (
     <section ref={secao} className="cartao painel-demo" aria-label="Área de demonstração">
       <div className="demo-topo">
@@ -185,6 +194,9 @@ export function PainelDemo({ regioes, aoMudar, aoFechar }: Props) {
             </button>
             <button type="button" className="btn-secundario" disabled={ocupado} onClick={encerrar}>
               Encerrar simulações
+            </button>
+            <button type="button" className="btn-secundario" disabled={ocupado} onClick={limparRelatos}>
+              🧹 Apagar relatos
             </button>
             <button type="button" className="btn-link" onClick={() => sair()}>
               Sair

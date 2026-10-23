@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,18 @@ public class RelatosController(PluviAlertaDbContext db) : ControllerBase
         }
 
         return Created($"/api/relatos/{criado.Relato.Id}", ParaResposta(criado.Relato));
+    }
+
+    [HttpDelete]
+    [Authorize(Roles = "admin")]
+    [EndpointSummary("Apaga todos os relatos (área de demonstração)")]
+    [EndpointDescription("Para apresentar com o mapa limpo depois dos ensaios. Recalcula na hora as regionais afetadas.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ApagarTodos([FromServices] ServicoDeRelatos relatos, CancellationToken ct)
+    {
+        var apagados = await relatos.ApagarTodosAsync(ct);
+        return Ok(new { relatosApagados = apagados });
     }
 
     private static RelatoResposta ParaResposta(Relato r) =>

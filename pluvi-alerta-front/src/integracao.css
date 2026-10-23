@@ -566,6 +566,48 @@ footer a {
   border: 1px solid var(--green-line);
 }
 
+/* ---------- QR code do bot na central de alertas ---------- */
+.qr-telegram {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--navy);
+  background: #eaf6fc;
+  border: 1px solid #b6e0f4;
+  transition: transform 0.15s ease;
+}
+
+.qr-telegram:hover {
+  transform: translateY(-1px);
+}
+
+.qr-telegram img {
+  display: block;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.qr-telegram span {
+  display: grid;
+  gap: 4px;
+  max-width: 150px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.qr-telegram svg {
+  color: #229ed9;
+}
+
+.qr-telegram strong {
+  font-size: 0.9rem;
+  color: #1a8bc2;
+}
+
 /* ---------- Área de demonstração (simulação sem Swagger) ---------- */
 .painel-demo {
   display: grid;

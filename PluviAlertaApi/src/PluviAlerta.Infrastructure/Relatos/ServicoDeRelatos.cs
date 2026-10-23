@@ -41,4 +41,19 @@ public class ServicoDeRelatos(PluviAlertaDbContext db, AtualizadorDeRisco atuali
         var score = await atualizador.RecalcularAsync(regiao.Id, ct);
         return new RelatoCriado(relato, regiao.Nome, score);
     }
+
+    /// <summary>
+    /// Apaga todos os relatos (botão da área de demonstração, para apresentar com o mapa limpo)
+    /// e recalcula na hora as regionais que tinham relato, para o score parar de contá-los.
+    /// </summary>
+    public async Task<int> ApagarTodosAsync(CancellationToken ct)
+    {
+        var regioesAfetadas = await db.Relatos.Select(r => r.RegiaoId).Distinct().ToListAsync(ct);
+        var apagados = await db.Relatos.ExecuteDeleteAsync(ct);
+
+        foreach (var regiaoId in regioesAfetadas)
+            await atualizador.RecalcularAsync(regiaoId, ct);
+
+        return apagados;
+    }
 }

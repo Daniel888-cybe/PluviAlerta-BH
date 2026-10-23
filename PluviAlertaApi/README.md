@@ -81,6 +81,7 @@ Com a API rodando em modo Development, a raiz (`/`) abre o **Swagger** em `/swag
 | `POST /api/auth/token` | ✅ Login do admin, devolve um JWT válido por 2 h. Limite de 5 tentativas por minuto por IP |
 | `POST /api/simulacao` | ✅ 🔒 Tempestade fictícia numa regional (veja abaixo) |
 | `DELETE /api/simulacao` | ✅ 🔒 Apaga os dados simulados e volta ao dado real |
+| `DELETE /api/relatos` | ✅ 🔒 Apaga todos os relatos (para apresentar com o mapa limpo) e recalcula as regionais |
 
 **Regras dos relatos** ([`RegrasRelato.cs`](src/PluviAlerta.Domain/Relatos/RegrasRelato.cs)):
 - O corpo é `{ "latitude", "longitude", "tipo", "descricao" }`. O `tipo` aceita `Alagamento`, `Deslizamento` ou `Outro`, uma lista provisória. A `descricao` é opcional, com até 280 caracteres.

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 import './integracao.css'
 import logoEscudo from './assets/logo-escudo.png'
+import qrTelegram from './assets/qr-telegram.svg' // gerado uma vez: npx qrcode https://t.me/PluviAlerta_bot
 import {
   buscarHistorico,
   buscarRegioes,
@@ -300,9 +301,13 @@ function App() {
             </ul>
           )}
         </div>
-        <a className="botao-telegram secundario" href={LINK_TELEGRAM} target="_blank" rel="noreferrer">
-          <IconeTelegram />
-          @PluviAlerta_bot
+        <a className="qr-telegram" href={LINK_TELEGRAM} target="_blank" rel="noreferrer">
+          <img src={qrTelegram} alt="QR code para abrir o bot @PluviAlerta_bot no Telegram" width={112} height={112} />
+          <span>
+            <IconeTelegram />
+            Aponte a câmera e receba os alertas
+            <strong>@PluviAlerta_bot</strong>
+          </span>
         </a>
       </section>
 

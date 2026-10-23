@@ -26,9 +26,10 @@ public class SimuladorDeTempestade(PluviAlertaDbContext db, AtualizadorDeRisco a
             MmAcum6h = chuvaAcum6hMm,
             MmPrevisao3h = previsao3hMm,
             Fonte = FonteDados.Simulacao,
+            RelatosExtras = relatos, // entram só na conta do score, sem criar pontos no mapa
         };
 
-        var scores = await atualizador.RegistrarAsync([leitura], agora, ct, relatosExtras: relatos);
+        var scores = await atualizador.RegistrarAsync([leitura], agora, ct);
         return scores[0];
     }
 
@@ -44,11 +45,15 @@ public class SimuladorDeTempestade(PluviAlertaDbContext db, AtualizadorDeRisco a
         return ids.ToHashSet();
     }
 
-    /// <summary>Apaga todos os dados simulados. O /api/regioes volta a mostrar o último dado real.</summary>
+    /// <summary>
+    /// Apaga todos os dados simulados, inclusive os alertas: senão a regra das 2 h
+    /// bloquearia o alerta no próximo ensaio da demo. O /api/regioes volta ao último dado real.
+    /// </summary>
     public async Task<int> EncerrarAsync(CancellationToken ct)
     {
         var scores = await db.ScoresRisco.Where(s => s.Fonte == FonteDados.Simulacao).ExecuteDeleteAsync(ct);
         await db.LeiturasChuva.Where(l => l.Fonte == FonteDados.Simulacao).ExecuteDeleteAsync(ct);
+        await db.AlertasEnviados.Where(a => a.Fonte == FonteDados.Simulacao).ExecuteDeleteAsync(ct);
         return scores;
     }
 }

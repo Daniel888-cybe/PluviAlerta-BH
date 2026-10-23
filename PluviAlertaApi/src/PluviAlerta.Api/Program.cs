@@ -7,10 +7,15 @@ using Microsoft.OpenApi.Models;
 using PluviAlerta.Api.Auth;
 using PluviAlerta.Api.Coleta;
 using PluviAlerta.Api.Controllers;
+using PluviAlerta.Infrastructure.Alertas;
 using PluviAlerta.Infrastructure.Dados;
+using PluviAlerta.Infrastructure.Relatos;
 using PluviAlerta.Infrastructure.OpenMeteo;
 using PluviAlerta.Infrastructure.Risco;
 using PluviAlerta.Infrastructure.Simulacao;
+using PluviAlerta.Infrastructure.Telegram;
+using PluviAlerta.Api.Telegram;
+using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +33,23 @@ builder.Services.AddHttpClient<OpenMeteoClient>(c =>
     c.Timeout = TimeSpan.FromSeconds(20);
 });
 builder.Services.AddScoped<AtualizadorDeRisco>();
+builder.Services.AddScoped<ServicoDeAlertas>();
+builder.Services.AddScoped<ServicoDeRelatos>();
+
+// Com token: alertas pelo Telegram e bot respondendo /start e /sair. Sem token: alertas só no log.
+var tokenTelegram = builder.Configuration["Telegram:BotToken"];
+if (!string.IsNullOrWhiteSpace(tokenTelegram))
+{
+    builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(tokenTelegram));
+    builder.Services.AddScoped<INotificadorAlerta, NotificadorTelegram>();
+    builder.Services.AddScoped<ComandosBot>();
+    builder.Services.AddSingleton<LimiteRelatosBot>();
+    builder.Services.AddHostedService<BotTelegramWorker>();
+}
+else
+{
+    builder.Services.AddScoped<INotificadorAlerta, NotificadorSoLog>();
+}
 builder.Services.AddScoped<SimuladorDeTempestade>();
 builder.Services.AddHostedService<ColetaWorker>();
 

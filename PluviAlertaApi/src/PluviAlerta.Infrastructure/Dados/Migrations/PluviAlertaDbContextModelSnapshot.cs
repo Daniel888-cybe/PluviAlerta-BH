@@ -33,6 +33,11 @@ namespace PluviAlerta.Infrastructure.Dados.Migrations
                     b.Property<DateTime>("EnviadoEm")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Fonte")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.Property<string>("Nivel")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -101,6 +106,9 @@ namespace PluviAlerta.Infrastructure.Dados.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("RegiaoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RelatosExtras")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

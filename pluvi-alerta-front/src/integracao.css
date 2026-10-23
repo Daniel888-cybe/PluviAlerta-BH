@@ -566,6 +566,107 @@ footer a {
   border: 1px solid var(--green-line);
 }
 
+/* ---------- Área de demonstração (simulação sem Swagger) ---------- */
+.painel-demo {
+  display: grid;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 2px dashed var(--orange);
+  background: linear-gradient(135deg, var(--orange-soft), #fff 70%);
+  scroll-margin-top: 16px;
+}
+
+.demo-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.painel-demo h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.demo-sub {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.demo-login,
+.demo-campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.demo-login label,
+.demo-campos label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.demo-login input,
+.demo-campos input {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: #fff;
+}
+
+.demo-campos input {
+  width: 130px;
+}
+
+.demo-passo {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.demo-regioes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-tempestade {
+  padding: 11px 18px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(100deg, var(--red), var(--orange));
+  box-shadow: 0 8px 18px -8px rgba(220, 38, 38, 0.7);
+}
+
+.btn-tempestade:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-link {
+  border: 0;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  text-decoration: underline;
+}
+
 @media (max-width: 900px) {
   .secao-mapa {
     grid-template-columns: 1fr;

@@ -56,6 +56,9 @@ export const buscarRegioes = () => getJson<RegiaoAtual[]>('/api/regioes')
 export const buscarHistorico = (id: number) => getJson<HistoricoRegiao>(`/api/regioes/${id}/historico`)
 export const buscarRelatosAtivos = () => getJson<Relato[]>('/api/relatos?ativos=true')
 
+// Mesmo valor de RegrasRelato.ValidadeHoras na API (quanto tempo um relato conta no risco).
+export const VALIDADE_RELATO_HORAS = 1
+
 export type TipoRelato = 'Alagamento' | 'Deslizamento' | 'Outro'
 
 export type NovoRelato = {
@@ -82,5 +85,55 @@ export async function criarRelato(novo: NovoRelato): Promise<Relato> {
   if (!resposta.ok) throw new Error('Não foi possível enviar o relato. Tente de novo.')
   return resposta.json() as Promise<Relato>
 }
+
+// ---------- Área de demonstração (rotas de admin, com JWT) ----------
+
+export class SessaoExpirada extends Error {}
+
+export async function entrarComoAdmin(usuario: string, senha: string): Promise<string> {
+  const resposta = await fetch('/api/auth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario, senha }),
+  })
+  if (resposta.status === 401) throw new Error('Usuário ou senha incorretos.')
+  if (resposta.status === 429) throw new Error('Muitas tentativas. Espere 1 minuto.')
+  if (!resposta.ok) throw new Error('Não foi possível entrar. Verifique se a API está no ar.')
+  const dados = (await resposta.json()) as { token: string }
+  return dados.token
+}
+
+export type ResultadoSimulacao = {
+  regiaoId: number
+  nome: string
+  score: number
+  nivel: Nivel
+  simuladoEm: string
+  validaAte: string
+}
+
+export type ParametrosSimulacao = {
+  regiaoId: number
+  chuvaAcum6hMm: number
+  previsao3hMm: number
+  relatos: number
+}
+
+async function chamarAdmin(token: string, metodo: 'POST' | 'DELETE', corpo?: unknown) {
+  const resposta = await fetch('/api/simulacao', {
+    method: metodo,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  })
+  if (resposta.status === 401) throw new SessaoExpirada('A sessão expirou. Entre de novo.')
+  if (!resposta.ok) throw new Error(`A API respondeu ${resposta.status}.`)
+  return resposta.json()
+}
+
+export const simularTempestade = (token: string, p: ParametrosSimulacao) =>
+  chamarAdmin(token, 'POST', p) as Promise<ResultadoSimulacao>
+
+export const encerrarSimulacoes = (token: string) =>
+  chamarAdmin(token, 'DELETE') as Promise<{ scoresSimuladosApagados: number }>
 
 export const LINK_TELEGRAM = 'https://t.me/PluviAlerta_bot'

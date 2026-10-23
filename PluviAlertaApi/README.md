@@ -86,7 +86,7 @@ Com a API rodando em modo Development, a raiz (`/`) abre o **Swagger** em `/swag
 - O corpo é `{ "latitude", "longitude", "tipo", "descricao" }`. O `tipo` aceita `Alagamento`, `Deslizamento` ou `Outro`, uma lista provisória. A `descricao` é opcional, com até 280 caracteres.
 - A coordenada precisa estar dentro de um retângulo **aproximado** em volta de BH. Esse retângulo não é o limite oficial do município.
 - A regional é a do **centro mais próximo**, até termos os polígonos das regionais.
-- O relato expira em **3 h**.
+- O relato expira em **1 h** (`RegrasRelato.ValidadeHoras`, valor provisório).
 - O limite é de **5 envios a cada 10 min por IP**. Acima disso, a API responde HTTP 429.
 - **O score da regional é recalculado na hora**, com a mesma chuva da última leitura, então não precisa esperar a próxima coleta. Isso só acontece se essa leitura tiver até 30 min, para não gerar alerta com dado velho. Durante uma simulação, os relatos fictícios da demo são preservados.
 
@@ -117,6 +117,10 @@ As datas estão sempre em UTC (com `Z`). As entradas do cálculo vêm junto, par
 
 Funciona **sem internet**. A leitura fictícia passa pelo mesmo código do dado real: `AtualizadorDeRisco` e depois `MotorDeRisco`.
 
+**O jeito mais fácil é pelo site.** Abra `http://localhost:5173/#demo`, ou use o link "Área de demonstração" no rodapé. Entre com o `ADMIN_USUARIO` e a `ADMIN_SENHA` do `.env`, escolha a regional e clique em **⛈️ Simular tempestade**. O botão **Encerrar simulações** volta ao dado real.
+
+**Pelo Swagger:**
+
 1. No Swagger, chame `POST /api/auth/token` com `{"usuario": "<ADMIN_USUARIO>", "senha": "<ADMIN_SENHA>"}`, usando os valores do `.env`. Copie o `token` da resposta.
 2. Clique em **Authorize** e cole o token.
 3. Chame `POST /api/simulacao` com `{"regiaoId": 5}`. O padrão é 60 mm em 6 h, 40 mm de previsão e 4 relatos. Com a vulnerabilidade provisória 50, o score fica em **90 (Vermelho)**.
@@ -132,6 +136,8 @@ A cada score novo, vindo do dado real ou da simulação, o [`ServicoDeAlertas`](
 - **não repete** o mesmo nível na mesma regional em menos de **2 h**.
 
 O alerta é gravado em `AlertasEnviados` e enviado aos inscritos da regional.
+
+**Aviso de "risco reduzido":** quando a regional sai de Laranja ou Vermelho e volta para Verde ou Amarelo, os inscritos recebem 🟢 "Risco reduzido". Esse aviso também sai ao **encerrar uma simulação**, o que fecha o ciclo da demo: alerta, redução.
 
 - **Sem `TELEGRAM_BOT_TOKEN`:** o alerta vai só para o log da API.
 - **Com token:** vai pelo Telegram, no bot **[@PluviAlerta_bot](https://t.me/PluviAlerta_bot)**.

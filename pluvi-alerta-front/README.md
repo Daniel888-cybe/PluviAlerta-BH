@@ -28,6 +28,7 @@ VITE_API_URL=http://localhost:8080
 - **Relatar um problema:** botão "📍 Relatar um problema", um clique no mapa, a escolha do tipo e o envio. O score da regional é recalculado na hora.
 - **Cards das regionais**, ordenados pelo score.
 - **Central de alertas**, com as regionais em Laranja ou Vermelho, e o link para o bot **@PluviAlerta_bot** no Telegram.
+- **Área de demonstração** (`/#demo` ou o link no rodapé): login do admin, escolha da regional e **⛈️ Simular tempestade** ou **Encerrar simulações**, sem usar o Swagger.
 - **Aviso de modo simulação** quando a demo injeta uma tempestade fictícia.
 - **Atualização automática** a cada 1 minuto.
 
@@ -40,6 +41,7 @@ VITE_API_URL=http://localhost:8080
 | `src/MapaRegionais.tsx` | Mapa (Leaflet + OpenStreetMap) |
 | `src/PainelRegional.tsx` | Painel "Por que esse score?" e o gráfico das 24 h |
 | `src/FormRelato.tsx` | Formulário de relato (clique no mapa) |
+| `src/PainelDemo.tsx` | Área de demonstração: login do admin e simulação |
 | `src/App.css` | Design original do painel |
 | `src/integracao.css` | Estilos do mapa, dos níveis de risco e dos alertas |
 

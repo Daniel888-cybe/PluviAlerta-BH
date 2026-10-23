@@ -180,7 +180,7 @@ public class ComandosBot(
         await bot.AnswerCallbackQuery(clique.Id, "Relato registrado. Obrigado!", cancellationToken: ct);
         await bot.EditMessageText(chatId, clique.Message.Id,
             $"✅ Relato de {tipo.ToString().ToLowerInvariant()} registrado na regional {criado.NomeRegiao}. " +
-            $"Ele aparece no mapa e conta no risco por 3 h.{score}\n\nObrigado por ajudar!",
+            $"Ele aparece no mapa e conta no risco por {RegrasRelato.ValidadeHoras} h.{score}\n\nObrigado por ajudar!",
             cancellationToken: ct);
     }
 }

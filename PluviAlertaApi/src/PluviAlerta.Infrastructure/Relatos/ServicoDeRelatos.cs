@@ -9,7 +9,7 @@ namespace PluviAlerta.Infrastructure.Relatos;
 public record RelatoCriado(Relato Relato, string NomeRegiao, ScoreRisco? ScoreRecalculado);
 
 /// <summary>
-/// Cria relato (site ou Telegram): valida, acha a regional, grava com validade de 3 h
+/// Cria relato (site ou Telegram): valida, acha a regional, grava com a validade de RegrasRelato
 /// e já recalcula o score da regional, para o número subir na hora.
 /// </summary>
 public class ServicoDeRelatos(PluviAlertaDbContext db, AtualizadorDeRisco atualizador)

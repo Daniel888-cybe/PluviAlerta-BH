@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { criarRelato, type Relato, type TipoRelato } from './api'
+import { criarRelato, VALIDADE_RELATO_HORAS, type Relato, type TipoRelato } from './api'
 
 type Props = {
   ponto: [number, number] | null
@@ -84,7 +84,7 @@ export function FormRelato({ ponto, aoEnviar, aoCancelar }: Props) {
           {enviando ? 'Enviando…' : 'Enviar relato'}
         </button>
       </div>
-      <small className="form-relato-nota">O relato aparece no mapa e conta no risco da regional por 3 h.</small>
+      <small className="form-relato-nota">O relato aparece no mapa e conta no risco da regional por {VALIDADE_RELATO_HORAS} h.</small>
     </div>
   )
 }

@@ -32,6 +32,26 @@ public class RegraAlertaTests
     }
 
     [Theory]
+    [InlineData(NivelRisco.Vermelho, NivelRisco.Verde, true)]
+    [InlineData(NivelRisco.Vermelho, NivelRisco.Amarelo, true)]
+    [InlineData(NivelRisco.Laranja, NivelRisco.Verde, true)]
+    [InlineData(NivelRisco.Laranja, NivelRisco.Amarelo, true)]
+    [InlineData(NivelRisco.Vermelho, NivelRisco.Laranja, false)] // ainda em alerta
+    [InlineData(NivelRisco.Amarelo, NivelRisco.Verde, false)]    // nunca esteve em alerta
+    [InlineData(NivelRisco.Verde, NivelRisco.Verde, false)]
+    [InlineData(NivelRisco.Laranja, NivelRisco.Vermelho, false)] // subiu
+    public void AvisaReducaoSoQuandoSaiDoAlerta(NivelRisco anterior, NivelRisco atual, bool esperado)
+    {
+        Assert.Equal(esperado, RegraAlerta.DeveAvisarReducao(anterior, atual));
+    }
+
+    [Fact]
+    public void Reducao_PrimeiraLeituraNaoAvisa()
+    {
+        Assert.False(RegraAlerta.DeveAvisarReducao(null, NivelRisco.Verde));
+    }
+
+    [Theory]
     [InlineData(10, false)]   // alertou há 10 min
     [InlineData(119, false)]  // há 1h59
     [InlineData(120, true)]   // há exatamente 2 h: pode alertar de novo

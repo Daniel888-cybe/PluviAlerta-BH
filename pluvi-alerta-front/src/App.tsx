@@ -7,12 +7,14 @@ import {
   buscarRegioes,
   buscarRelatosAtivos,
   LINK_TELEGRAM,
+  VALIDADE_RELATO_HORAS,
   type HistoricoRegiao,
   type RegiaoAtual,
   type Relato,
 } from './api'
 import { FormRelato } from './FormRelato'
 import { MapaRegionais } from './MapaRegionais'
+import { PainelDemo } from './PainelDemo'
 import { PainelRegional } from './PainelRegional'
 import { classeNivel, descricaoNivel, emAlerta, formatarHora, formatarMm } from './risco'
 
@@ -29,6 +31,14 @@ function App() {
   const [modoRelato, setModoRelato] = useState(false)
   const [pontoRelato, setPontoRelato] = useState<[number, number] | null>(null)
   const [avisoRelato, setAvisoRelato] = useState('')
+  // Área de demonstração: abre pelo link do rodapé ou pelo endereço .../#demo
+  const [mostrarDemo, setMostrarDemo] = useState(() => window.location.hash === '#demo')
+
+  useEffect(() => {
+    const aoMudarHash = () => setMostrarDemo(window.location.hash === '#demo')
+    window.addEventListener('hashchange', aoMudarHash)
+    return () => window.removeEventListener('hashchange', aoMudarHash)
+  }, [])
 
   const atualizar = useCallback(async () => {
     try {
@@ -70,6 +80,17 @@ function App() {
   const temSimulacao = regioes.some((r) => r.fonte === 'simulacao')
   const ordenadas = [...regioes].sort((a, b) => b.score - a.score)
 
+  function fecharDemo() {
+    // Tira o #demo do endereço sem recarregar a página.
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+    setMostrarDemo(false)
+  }
+
+  async function demoMudou(regiaoId?: number) {
+    if (regiaoId !== undefined) setSelecionadaId(regiaoId)
+    await atualizar()
+  }
+
   function fecharRelato() {
     setModoRelato(false)
     setPontoRelato(null)
@@ -78,7 +99,7 @@ function App() {
   async function relatoEnviado(relato: Relato) {
     fecharRelato()
     const nome = regioes.find((r) => r.id === relato.regiaoId)?.nome ?? 'sua regional'
-    setAvisoRelato(`Relato enviado para a regional ${nome}. Obrigado! Ele conta no risco por 3 h.`)
+    setAvisoRelato(`Relato enviado para a regional ${nome}. Obrigado! Ele conta no risco por ${VALIDADE_RELATO_HORAS} h.`)
     setTimeout(() => setAvisoRelato(''), 8000)
     setSelecionadaId(relato.regiaoId)
     await atualizar() // a API já recalculou o score: busca o número novo na hora
@@ -147,7 +168,7 @@ function App() {
         <article className="cartao indicador">
           <span>Relatos de moradores</span>
           <strong>{carregando ? '--' : relatos.length}</strong>
-          <small>Ativos nas últimas 3 h</small>
+          <small>Ativos na última {VALIDADE_RELATO_HORAS === 1 ? 'hora' : `${VALIDADE_RELATO_HORAS} h`}</small>
         </article>
       </section>
 
@@ -159,6 +180,8 @@ function App() {
           </button>
         </p>
       )}
+
+      {mostrarDemo && <PainelDemo regioes={regioes} aoMudar={demoMudou} aoFechar={fecharDemo} />}
 
       <section className="secao-mapa">
         <div className="cartao mapa-cartao">
@@ -294,7 +317,10 @@ function App() {
           não de pluviômetro · Mapa ©{' '}
           <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>
         </p>
-        <p>PluviAlerta-BH · Sistemas de Informação · UniBH · ODS 11 e 13</p>
+        <p>
+          PluviAlerta-BH · Sistemas de Informação · UniBH · ODS 11 e 13 ·{' '}
+          <a href="#demo">Área de demonstração</a>
+        </p>
       </footer>
     </main>
   )

@@ -38,7 +38,7 @@ public class RelatosController(PluviAlertaDbContext db) : ControllerBase
     [HttpPost]
     [EnableRateLimiting(PoliticaLimite)]
     [EndpointSummary("Cria um relato de alagamento ou outro problema")]
-    [EndpointDescription("A regional é a do centro mais próximo. O relato expira em 3 h e o score da regional " +
+    [EndpointDescription("A regional é a do centro mais próximo. O relato expira (validade em RegrasRelato) e o score da regional " +
                          "é recalculado na hora (se a última leitura tiver até 30 min). Limite de envios por IP.")]
     [ProducesResponseType<RelatoResposta>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

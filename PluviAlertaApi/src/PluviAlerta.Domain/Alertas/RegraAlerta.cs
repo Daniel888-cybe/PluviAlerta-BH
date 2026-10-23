@@ -27,4 +27,11 @@ public static class RegraAlerta
                              && agoraUtc - ultimoAlertaMesmoNivelUtc < IntervaloMinimoMesmoNivel;
         return !alertouHaPouco;
     }
+
+    /// <summary>
+    /// "Risco baixou": a regional estava em alerta (Laranja/Vermelho) e voltou para Verde/Amarelo.
+    /// Vermelho → Laranja não conta: continua em alerta.
+    /// </summary>
+    public static bool DeveAvisarReducao(NivelRisco? anterior, NivelRisco atual) =>
+        anterior >= NivelMinimo && atual < NivelMinimo;
 }

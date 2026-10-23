@@ -26,7 +26,8 @@ public class NotificadorTelegram(ITelegramBotClient bot, ILogger<NotificadorTele
             }
         }
 
-        log.LogInformation("Alerta {Nivel} da regional {Regiao} enviado para {Enviados}/{Total} inscrito(s).",
+        log.LogInformation("{Tipo} {Nivel} da regional {Regiao} enviado para {Enviados}/{Total} inscrito(s).",
+            alerta.Reducao ? "Aviso de redução" : "Alerta",
             alerta.Score.Nivel, alerta.NomeRegiao, enviados, chatIds.Count);
     }
 }

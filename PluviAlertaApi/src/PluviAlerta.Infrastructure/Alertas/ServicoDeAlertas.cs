@@ -23,6 +23,14 @@ public class ServicoDeAlertas(PluviAlertaDbContext db, INotificadorAlerta notifi
                 .MaxAsync(a => (DateTime?)a.EnviadoEm, ct);
 
             var anterior = niveisAnteriores.TryGetValue(s.RegiaoId, out var n) ? n : (NivelRisco?)null;
+
+            // Saiu do alerta: avisa que o risco baixou (não entra em AlertasEnviados, que controla só as subidas).
+            if (RegraAlerta.DeveAvisarReducao(anterior, s.Nivel))
+            {
+                await NotificarAsync(s, reducao: true, ct);
+                continue;
+            }
+
             if (!RegraAlerta.DeveAlertar(anterior, s.Nivel, ultimoMesmoNivel, agoraUtc))
                 continue;
 
@@ -33,20 +41,28 @@ public class ServicoDeAlertas(PluviAlertaDbContext db, INotificadorAlerta notifi
             });
             await db.SaveChangesAsync(ct);
 
-            var nome = await db.Regioes.Where(r => r.Id == s.RegiaoId).Select(r => r.Nome).FirstAsync(ct);
-            var chatIds = await db.Inscricoes
-                .Where(i => i.RegiaoId == s.RegiaoId)
-                .Select(i => i.TelegramChatId)
-                .ToListAsync(ct);
+            await NotificarAsync(s, reducao: false, ct);
+        }
+    }
 
-            try
-            {
-                await notificador.NotificarAsync(new Alerta(nome, s), chatIds, ct);
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                log.LogError(ex, "Falha ao enviar alerta da regional {Regiao}.", nome);
-            }
+    /// <summary>Avisa "risco reduzido" aos inscritos (usado também ao encerrar uma simulação).</summary>
+    public Task AvisarReducaoAsync(ScoreRisco atual, CancellationToken ct) => NotificarAsync(atual, reducao: true, ct);
+
+    private async Task NotificarAsync(ScoreRisco s, bool reducao, CancellationToken ct)
+    {
+        var nome = await db.Regioes.Where(r => r.Id == s.RegiaoId).Select(r => r.Nome).FirstAsync(ct);
+        var chatIds = await db.Inscricoes
+            .Where(i => i.RegiaoId == s.RegiaoId)
+            .Select(i => i.TelegramChatId)
+            .ToListAsync(ct);
+
+        try
+        {
+            await notificador.NotificarAsync(new Alerta(nome, s, reducao), chatIds, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogError(ex, "Falha ao enviar alerta da regional {Regiao}.", nome);
         }
     }
 }

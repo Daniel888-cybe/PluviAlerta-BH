@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using PluviAlerta.Api.Contratos;
 using PluviAlerta.Domain.Entidades;
-using PluviAlerta.Domain.Relatos;
+using PluviAlerta.Infrastructure.Relatos;
 using PluviAlerta.Infrastructure.Dados;
 
 namespace PluviAlerta.Api.Controllers;
@@ -38,36 +39,35 @@ public class RelatosController(PluviAlertaDbContext db) : ControllerBase
     [HttpPost]
     [EnableRateLimiting(PoliticaLimite)]
     [EndpointSummary("Cria um relato de alagamento ou outro problema")]
-    [EndpointDescription("A regional é a do centro mais próximo. O relato expira em 3 h. Limite de envios por IP.")]
+    [EndpointDescription("A regional é a do centro mais próximo. O relato expira (validade em RegrasRelato) e o score da regional " +
+                         "é recalculado na hora (se a última leitura tiver até 30 min). Limite de envios por IP.")]
     [ProducesResponseType<RelatoResposta>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<IActionResult> Criar(CriarRelatoRequest request, CancellationToken ct)
+    public async Task<IActionResult> Criar(
+        CriarRelatoRequest request, [FromServices] ServicoDeRelatos relatos, CancellationToken ct)
     {
-        var (lat, lon) = (request.Latitude!.Value, request.Longitude!.Value);
-        if (!RegrasRelato.DentroDeBH(lat, lon))
+        var criado = await relatos.CriarAsync(
+            request.Latitude!.Value, request.Longitude!.Value, request.Tipo!.Value, request.Descricao, ct);
+        if (criado is null)
         {
             ModelState.AddModelError(nameof(request.Latitude), "A coordenada precisa estar dentro de Belo Horizonte.");
             return ValidationProblem(ModelState);
         }
 
-        var regioes = await db.Regioes.AsNoTracking().ToListAsync(ct);
-        var agora = DateTime.UtcNow;
-        var relato = new Relato
-        {
-            Latitude = lat,
-            Longitude = lon,
-            RegiaoId = RegrasRelato.RegiaoMaisProxima(lat, lon, regioes).Id,
-            Tipo = request.Tipo!.Value.ToString(),
-            Descricao = string.IsNullOrWhiteSpace(request.Descricao) ? null : request.Descricao.Trim(),
-            CriadoEm = agora,
-            ExpiraEm = agora + RegrasRelato.Validade,
-        };
+        return Created($"/api/relatos/{criado.Relato.Id}", ParaResposta(criado.Relato));
+    }
 
-        db.Relatos.Add(relato);
-        await db.SaveChangesAsync(ct);
-
-        return Created($"/api/relatos/{relato.Id}", ParaResposta(relato));
+    [HttpDelete]
+    [Authorize(Roles = "admin")]
+    [EndpointSummary("Apaga todos os relatos (área de demonstração)")]
+    [EndpointDescription("Para apresentar com o mapa limpo depois dos ensaios. Recalcula na hora as regionais afetadas.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ApagarTodos([FromServices] ServicoDeRelatos relatos, CancellationToken ct)
+    {
+        var apagados = await relatos.ApagarTodosAsync(ct);
+        return Ok(new { relatosApagados = apagados });
     }
 
     private static RelatoResposta ParaResposta(Relato r) =>

@@ -4,7 +4,10 @@ namespace PluviAlerta.Domain.Relatos;
 
 public static class RegrasRelato
 {
-    public static readonly TimeSpan Validade = TimeSpan.FromHours(3);
+    // Quanto tempo um relato conta no risco. Os textos do bot e da API leem daqui.
+    // (No front, a mesma constante está em src/api.ts: VALIDADE_RELATO_HORAS.)
+    public const int ValidadeHoras = 1;
+    public static readonly TimeSpan Validade = TimeSpan.FromHours(ValidadeHoras);
 
     // Retângulo APROXIMADO em volta do município de BH (com folga). Não é o limite oficial:
     // serve só para barrar coordenadas claramente fora da cidade.

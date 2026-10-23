@@ -1,32 +1,54 @@
-# React + TypeScript + Vite
+# PluviAlerta BH: front
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Painel em React, TypeScript e Vite, com mapa (react-leaflet) do risco de chuva nas 9 regionais de Belo Horizonte. Ele consome a API em [`../PluviAlertaApi`](../PluviAlertaApi).
 
-Currently, two official plugins are available:
+> Estimativa de um projeto acadêmico, não é alerta oficial. Em emergência, ligue **199** (Defesa Civil).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Como rodar
 
-## React Compiler
+Primeiro suba a API, seguindo o README dela. Depois:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Abra http://localhost:5173.
+
+O front chama `/api/...`, e o Vite repassa essas chamadas para a API ([`vite.config.ts`](vite.config.ts)). Por padrão, ele procura a API em `http://localhost:5261`, que é a porta do `dotnet run`. Se a API estiver no Docker, crie um arquivo `.env.local` com:
+
+```
+VITE_API_URL=http://localhost:8080
+```
+
+## O que tem na tela
+
+- **Mapa** com as 9 regionais coloridas pelo nível de risco e os relatos de moradores ativos.
+- **"Por que esse score?":** quanto cada fator pesou (chuva, previsão, vulnerabilidade e relatos) e o gráfico das últimas 24 h.
+- **Relatar um problema:** botão "📍 Relatar um problema", um clique no mapa, a escolha do tipo e o envio. O score da regional é recalculado na hora.
+- **Cards das regionais**, ordenados pelo score.
+- **Central de alertas**, com as regionais em Laranja ou Vermelho, e o link para o bot **@PluviAlerta_bot** no Telegram.
+- **Área de demonstração** (`/#demo` ou o link no rodapé): login do admin, escolha da regional e **⛈️ Simular tempestade**, **Encerrar simulações** ou **🧹 Apagar relatos**, sem usar o Swagger.
+- **QR code do bot** na central de alertas. A imagem foi gerada uma vez, com `npx qrcode`, e não usa biblioteca no site.
+
+O roteiro da apresentação está em [`../docs/ROTEIRO-DEMO.md`](../docs/ROTEIRO-DEMO.md).
+- **Aviso de modo simulação** quando a demo injeta uma tempestade fictícia.
+- **Atualização automática** a cada 1 minuto.
+
+## Arquivos
+
+| Arquivo | Para que serve |
+|---|---|
+| `src/api.ts` | Tipos do contrato da API e funções de busca |
+| `src/risco.ts` | Cores e textos por nível, e o detalhamento do score (mesma fórmula da API, só para exibição) |
+| `src/MapaRegionais.tsx` | Mapa (Leaflet + OpenStreetMap) |
+| `src/PainelRegional.tsx` | Painel "Por que esse score?" e o gráfico das 24 h |
+| `src/FormRelato.tsx` | Formulário de relato (clique no mapa) |
+| `src/PainelDemo.tsx` | Área de demonstração: login do admin e simulação |
+| `src/App.css` | Design original do painel |
+| `src/integracao.css` | Estilos do mapa, dos níveis de risco e dos alertas |
+
+## Créditos
+
+- Dados meteorológicos: [Open-Meteo](https://open-meteo.com/), sob a licença CC BY 4.0.
+- Mapa: © [OpenStreetMap](https://www.openstreetmap.org/copyright).

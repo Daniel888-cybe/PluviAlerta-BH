@@ -67,6 +67,7 @@ public class PluviAlertaDbContext(DbContextOptions<PluviAlertaDbContext> options
             e.HasOne<Regiao>().WithMany().HasForeignKey(a => a.RegiaoId);
             e.HasIndex(a => new { a.RegiaoId, a.EnviadoEm });
             e.Property(a => a.Nivel).HasConversion<string>().HasMaxLength(10);
+            e.Property(a => a.Fonte).HasMaxLength(20);
         });
     }
 }

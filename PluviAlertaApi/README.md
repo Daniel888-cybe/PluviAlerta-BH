@@ -81,13 +81,20 @@ Com a API rodando em modo Development, a raiz (`/`) abre o **Swagger** em `/swag
 | `POST /api/auth/token` | ✅ Login do admin, devolve um JWT válido por 2 h. Limite de 5 tentativas por minuto por IP |
 | `POST /api/simulacao` | ✅ 🔒 Tempestade fictícia numa regional (veja abaixo) |
 | `DELETE /api/simulacao` | ✅ 🔒 Apaga os dados simulados e volta ao dado real |
+| `DELETE /api/relatos` | ✅ 🔒 Apaga todos os relatos (para apresentar com o mapa limpo) e recalcula as regionais |
 
 **Regras dos relatos** ([`RegrasRelato.cs`](src/PluviAlerta.Domain/Relatos/RegrasRelato.cs)):
 - O corpo é `{ "latitude", "longitude", "tipo", "descricao" }`. O `tipo` aceita `Alagamento`, `Deslizamento` ou `Outro`, uma lista provisória. A `descricao` é opcional, com até 280 caracteres.
 - A coordenada precisa estar dentro de um retângulo **aproximado** em volta de BH. Esse retângulo não é o limite oficial do município.
 - A regional é a do **centro mais próximo**, até termos os polígonos das regionais.
-- O relato expira em **3 h**.
+- O relato expira em **1 h** (`RegrasRelato.ValidadeHoras`, valor provisório).
 - O limite é de **5 envios a cada 10 min por IP**. Acima disso, a API responde HTTP 429.
+- **O score da regional é recalculado na hora**, com a mesma chuva da última leitura, então não precisa esperar a próxima coleta. Isso só acontece se essa leitura tiver até 30 min, para não gerar alerta com dado velho. Durante uma simulação, os relatos fictícios da demo são preservados.
+
+**Três jeitos de enviar um relato**, todos passando pelo [`ServicoDeRelatos`](src/PluviAlerta.Infrastructure/Relatos/ServicoDeRelatos.cs):
+1. **Pelo site:** botão "📍 Relatar um problema" e um clique no mapa.
+2. **Pelo Telegram:** `/relatar`, depois "📍 Enviar minha localização" e a escolha do tipo. O limite é de 5 a cada 10 min por chat. O relato não guarda quem enviou (LGPD).
+3. **Pela API:** `POST /api/relatos`, que é o caminho dos outros dois.
 
 Exemplo de item do `GET /api/regioes`:
 
@@ -111,6 +118,10 @@ As datas estão sempre em UTC (com `Z`). As entradas do cálculo vêm junto, par
 
 Funciona **sem internet**. A leitura fictícia passa pelo mesmo código do dado real: `AtualizadorDeRisco` e depois `MotorDeRisco`.
 
+**O jeito mais fácil é pelo site.** Abra `http://localhost:5173/#demo`, ou use o link "Área de demonstração" no rodapé. Entre com o `ADMIN_USUARIO` e a `ADMIN_SENHA` do `.env`, escolha a regional e clique em **⛈️ Simular tempestade**. O botão **Encerrar simulações** volta ao dado real.
+
+**Pelo Swagger:**
+
 1. No Swagger, chame `POST /api/auth/token` com `{"usuario": "<ADMIN_USUARIO>", "senha": "<ADMIN_SENHA>"}`, usando os valores do `.env`. Copie o `token` da resposta.
 2. Clique em **Authorize** e cole o token.
 3. Chame `POST /api/simulacao` com `{"regiaoId": 5}`. O padrão é 60 mm em 6 h, 40 mm de previsão e 4 relatos. Com a vulnerabilidade provisória 50, o score fica em **90 (Vermelho)**.
@@ -118,6 +129,29 @@ Funciona **sem internet**. A leitura fictícia passa pelo mesmo código do dado 
 5. Para ensaiar de novo: `DELETE /api/simulacao`.
 
 Os 4 relatos da simulação entram só na conta do score. Eles não criam pontos no mapa.
+
+## Alertas
+
+A cada score novo, vindo do dado real ou da simulação, o [`ServicoDeAlertas`](src/PluviAlerta.Infrastructure/Alertas/ServicoDeAlertas.cs) aplica a [`RegraAlerta`](src/PluviAlerta.Domain/Alertas/RegraAlerta.cs):
+- **avisa** quando o nível **sobe** para Laranja ou Vermelho;
+- **não repete** o mesmo nível na mesma regional em menos de **2 h**.
+
+O alerta é gravado em `AlertasEnviados` e enviado aos inscritos da regional.
+
+**Aviso de "risco reduzido":** quando a regional sai de Laranja ou Vermelho e volta para Verde ou Amarelo, os inscritos recebem 🟢 "Risco reduzido". Esse aviso também sai ao **encerrar uma simulação**, o que fecha o ciclo da demo: alerta, redução.
+
+- **Sem `TELEGRAM_BOT_TOKEN`:** o alerta vai só para o log da API.
+- **Com token:** vai pelo Telegram, no bot **[@PluviAlerta_bot](https://t.me/PluviAlerta_bot)**.
+
+**Bot do Telegram:**
+- `/start` mostra as 9 regionais em botões. Tocar num botão inscreve a pessoa naquela regional, e dá para escolher mais de uma.
+- `/relatar` mostra o botão "📍 Enviar minha localização". O bot pergunta o tipo (Alagamento, Deslizamento ou Outro) e cria o relato.
+- `/sair` apaga o cadastro.
+- Pela LGPD, o banco guarda só o ID do chat e a regional.
+- O bot recebe as mensagens por *long polling*, ou seja, a API pergunta ao Telegram de tempos em tempos se chegou mensagem. Por isso não precisa de endereço público.
+- **Só uma instância da API pode ficar ligada com o token por vez.** Com duas, o Telegram recusa a segunda.
+
+O `DELETE /api/simulacao` também apaga os alertas simulados. Assim dá para ensaiar a demo várias vezes sem cair na regra das 2 h.
 
 ## Coleta do Open-Meteo
 
@@ -171,7 +205,7 @@ Pesos e cortes são **provisórios**. Eles serão ajustados depois de validar co
 | `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD` | Banco MySQL do compose. A API recebe a connection string montada a partir delas. |
 | `JWT_CHAVE` | Chave do JWT, com 32 ou mais caracteres aleatórios (`openssl rand -base64 48`). Sem ela a API não sobe. |
 | `ADMIN_USUARIO`, `ADMIN_SENHA` | Login do admin, usado na simulação. Sem eles a API não sobe. |
-| `TELEGRAM_BOT_TOKEN` | Token do bot (pelo @BotFather). Só é necessário a partir do passo do bot. |
+| `TELEGRAM_BOT_TOKEN` | Token do bot, gerado no @BotFather. É opcional: sem ele, os alertas vão só para o log. |
 
 Os segredos ficam no `.env`, que está no `.gitignore`. Para rodar sem Docker, os mesmos valores vão no `dotnet user-secrets`:
 
@@ -187,7 +221,7 @@ dotnet user-secrets set "Admin:Senha" "<ADMIN_SENHA>" --project src/PluviAlerta.
 - [x] 2. `MotorDeRisco` com testes
 - [x] 3. Entidades, `DbContext`, migration e seed das 9 regionais
 - [x] 4. `GET /api/regioes` com dados mockados e Swagger
-- [ ] 5. Worker do Open-Meteo ✅, relatos ✅, simulação ✅, bot do Telegram
+- [x] 5. Worker do Open-Meteo, relatos, simulação, alertas e bot do Telegram
 
 ## Créditos
 
